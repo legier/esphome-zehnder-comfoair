@@ -62,7 +62,7 @@ substitutions:
   api_encryption_key: !secret api_encryption_key
 
 packages:
-  remote_package_shorthand: github://yoziru/esphome-zehnder-comfoair/zehnder-comfoair-q-esp32-evb.dashboard.yml@main
+  remote_package_shorthand: github://legier/esphome-zehnder-comfoair/zehnder-comfoair-q-esp32-evb.dashboard.yml@main
 ```
 
 Be sure to use the correct `.dashboard.yml` file for your board. Also make sure you have the secrets defined otherwise it will not work and use defaults from this repository. Finally, make sure you set your `flash_size` correctly, because otherwise you will get errors after booting, by adding this to your `substitutions`:

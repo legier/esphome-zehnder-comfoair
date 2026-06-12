@@ -25,7 +25,7 @@ esphome:
   friendly_name: ${friendly_name}
   comment: ${device_description}
   project:
-    name: yoziru.esphome-zehnder-comfoair
+    name: legier.esphome-zehnder-comfoair
     version: "2024.8.0"
 
 logger:
