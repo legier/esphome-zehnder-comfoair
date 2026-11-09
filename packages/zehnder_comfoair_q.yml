@@ -6,6 +6,8 @@ zehnder_comfoair_q:
   request_ids:
     [
       16,
+      17,
+      18,
       49,
       54,
       55,
@@ -15,6 +17,8 @@ zehnder_comfoair_q:
       67,
       81,
       82,
+      115,
+      116,
       117,
       118,
       119,
@@ -24,7 +28,12 @@ zehnder_comfoair_q:
       128,
       129,
       130,
+      144,
+      145,
+      146,
+      176,
       192,
+      208,
       209,
       210,
       211,
@@ -37,8 +46,10 @@ zehnder_comfoair_q:
       218,
       220,
       221,
+      224,
       225,
       227,
+      228,
       274,
       275,
       276,
@@ -49,4 +60,24 @@ zehnder_comfoair_q:
       292,
       293,
       294,
+      # Pressure sensors
+      305,
+      306,
+      # Analog inputs
+      369,
+      370,
+      371,
+      372,
+      # Post-heater
+      400,
+      401,
+      402,
+      # ComfoFond
+      416,
+      417,
+      418,
+      419,
+      # ComfoCool
+      784,
+      802,
     ]

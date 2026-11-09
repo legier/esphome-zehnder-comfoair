@@ -15,6 +15,38 @@ binary_sensor:
             state: OFF
 
   - platform: template
+    id: ventilation_alarm # PDO 17, e.g. set while a filter alarm is active
+    name: "Alarm"
+    device_class: problem
+
+  - platform: template
+    id: exhaust_fan_enabled # PDO 115 (F12)
+    name: "Exhaust Fan Enabled"
+    icon: mdi:fan
+    device_class: running
+
+  - platform: template
+    id: supply_fan_enabled # PDO 116 (F22)
+    name: "Supply Fan Enabled"
+    icon: mdi:fan
+    device_class: running
+
+  - platform: template
+    id: post_heater_present # PDO 402
+    name: "Post-heater Present"
+    entity_category: diagnostic
+
+  - platform: template
+    id: comfofond_ghe_present # PDO 419
+    name: "ComfoFond GHE Present"
+    entity_category: diagnostic
+
+  - platform: template
+    id: comfocool_state # PDO 784 (compressor)
+    name: "ComfoCool State"
+    device_class: running
+
+  - platform: template
     id: heating_season # PDO 210 (raw)
     name: "Heating Season"
     icon: mdi:snowflake-thermometer

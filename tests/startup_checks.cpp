@@ -44,7 +44,9 @@ for (const auto &entry : std::vector<std::pair<uint16_t, sensor::Sensor *>>{
          {192, id(filter_replacement_remaining_days)},
          {213, id(avoided_heating_actual)}, {214, id(avoided_heating_ytd)},
          {215, id(avoided_heating_total)}, {216, id(avoided_cooling_actual)},
-         {217, id(avoided_cooling_ytd)}, {218, id(avoided_cooling_total)}}) {
+         {217, id(avoided_cooling_ytd)}, {218, id(avoided_cooling_total)},
+         {144, id(pre_heater_energy_ytd)}, {145, id(pre_heater_energy_since_start)},
+         {146, id(pre_heater_power)}, {305, id(exhaust_pressure)}, {306, id(supply_pressure)}}) {
   bus.receive(entry.first, std::vector<uint8_t>{0x40, 0x9c}); // 40000 unsigned
   check(entry.second->get_raw_state() == 40000, "documented UINT16 PDO retains values above 32767");
 }
@@ -55,6 +57,33 @@ for (const auto &payload : std::vector<std::vector<uint8_t>>{{}, {1, 2, 3}, {1, 
   check(id(energy_ytd).get_raw_state() == 40000, "unsupported PDO widths do not publish invented state");
 }
 check(bus.sent.empty(), "numeric PDO decoding never sends control commands");
+
+for (const auto &entry : std::vector<std::pair<uint8_t, std::string>>{
+         {1, "Normal"}, {6, "Standby"}, {7, "Away"}, {8, "DFC"}, {2, "Filter Wizard"}, {9, "9"}}) {
+  bus.receive(16, entry.first);
+  check(id(device_state).state == entry.second && id(away_indicator).state == (entry.first == 7),
+        "device state names every PDO 16 value and keeps Away Indicator in sync");
+}
+bus.receive(16, 1);
+bus.receive(17, 1);
+check(id(ventilation_alarm).state, "PDO 17 alarm flag sets the alarm binary sensor");
+bus.receive(17, 0);
+check(!id(ventilation_alarm).state, "PDO 17 alarm flag clears the alarm binary sensor");
+bus.receive(18, 2);
+check(id(application_mode).state == "Filter Wizard", "PDO 18 application mode is named");
+bus.receive(224, 3);
+check(id(airflow_unit).state == "m³/h", "PDO 224 airflow unit is named");
+bus.receive(115, 1);
+bus.receive(116, 0);
+check(id(exhaust_fan_enabled).state && !id(supply_fan_enabled).state,
+      "PDO 115/116 report each fan's enabled state independently");
+bus.receive(402, 1);
+check(id(post_heater_present).state, "PDO 402 post-heater presence is a binary sensor");
+bus.receive(369, 55);
+check(std::abs(id(analog_input_1).state - 5.5f) < 0.001f, "analog input is scaled to volts");
+bus.receive(417, std::vector<uint8_t>{0x85, 0xff});
+check(std::abs(id(comfofond_ground_temp).state + 12.3f) < 0.001f, "accessory INT16 PDO preserves negative temperature");
+check(bus.sent.empty(), "new PDO feedback never sends control commands");
 
 bus.receive(81, std::vector<uint8_t>{0x00, 0x00, 0x00, 0x80});
 check(id(next_fan_change_in).state == "24855d3h14m8s", "UINT32 duration above INT32_MAX is not a no-change sentinel");

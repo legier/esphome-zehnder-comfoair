@@ -26,7 +26,9 @@ sensor:
     accuracy_decimals: 0
     on_value:
       then:
-        - lambda: id(away_indicator).publish_state(x == 7);
+        - lambda: |-
+            id(away_indicator).publish_state(x == 7);
+            id(device_state).publish_state(std::to_string(int(x)));
 
   - platform: template
     id: fan_level_raw # PDO 65
@@ -155,6 +157,31 @@ sensor:
     state_class: total_increasing
 
   - platform: template
+    id: pre_heater_energy_ytd # PDO 144
+    name: "Pre-heater Energy YTD"
+    accuracy_decimals: 0
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  - platform: template
+    id: pre_heater_energy_since_start # PDO 145
+    name: "Pre-heater Energy Since Start"
+    accuracy_decimals: 0
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  - platform: template
+    id: pre_heater_power # PDO 146
+    name: "Pre-heater Power"
+    accuracy_decimals: 0
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+    filters: *throttle-filter
+
+  - platform: template
     id: filter_replacement_remaining_days # PDO 192
     name: "Filter Replacement Remaining Days"
     icon: mdi:air-filter
@@ -269,6 +296,14 @@ sensor:
     state_class: measurement
 
   - platform: template
+    id: frost_protection_unbalance # PDO 228
+    name: "Frost Protection Unbalance"
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    unit_of_measurement: "%"
+    state_class: measurement
+
+  - platform: template
     id: extract_air_temp # PDO 274
     name: "Extract Air Temperature"
     filters: [multiply: 0.1]
@@ -351,4 +386,112 @@ sensor:
     accuracy_decimals: 0
     unit_of_measurement: "%"
     device_class: humidity
+    state_class: measurement
+
+  - platform: template
+    id: exhaust_pressure # PDO 305 (P12)
+    name: "Exhaust Pressure"
+    accuracy_decimals: 0
+    unit_of_measurement: "Pa"
+    device_class: pressure
+    state_class: measurement
+    filters: *throttle-filter
+
+  - platform: template
+    id: supply_pressure # PDO 306 (P22)
+    name: "Supply Pressure"
+    accuracy_decimals: 0
+    unit_of_measurement: "Pa"
+    device_class: pressure
+    state_class: measurement
+    filters: *throttle-filter
+
+  # 0-10 V analog inputs (PDO 369-372), value in 0.1 V
+  - platform: template
+    id: analog_input_1 # PDO 369
+    name: "Analog Input 1"
+    filters: [multiply: 0.1]
+    accuracy_decimals: 1
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+
+  - platform: template
+    id: analog_input_2 # PDO 370
+    name: "Analog Input 2"
+    filters: [multiply: 0.1]
+    accuracy_decimals: 1
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+
+  - platform: template
+    id: analog_input_3 # PDO 371
+    name: "Analog Input 3"
+    filters: [multiply: 0.1]
+    accuracy_decimals: 1
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+
+  - platform: template
+    id: analog_input_4 # PDO 372
+    name: "Analog Input 4"
+    filters: [multiply: 0.1]
+    accuracy_decimals: 1
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+
+  # Post-heater (PDO 400-401)
+  - platform: template
+    id: post_heater_temp # PDO 400
+    name: "Post-heater Temperature"
+    filters: [multiply: 0.1]
+    accuracy_decimals: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+
+  - platform: template
+    id: post_heater_state # PDO 401
+    name: "Post-heater State"
+    icon: mdi:radiator
+    accuracy_decimals: 0
+    unit_of_measurement: "%"
+    state_class: measurement
+
+  # ComfoFond ground heat exchanger (PDO 416-418)
+  - platform: template
+    id: comfofond_outdoor_air_temp # PDO 416
+    name: "ComfoFond Outdoor Air Temperature"
+    filters: [multiply: 0.1]
+    accuracy_decimals: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+
+  - platform: template
+    id: comfofond_ground_temp # PDO 417
+    name: "ComfoFond Ground Temperature"
+    filters: [multiply: 0.1]
+    accuracy_decimals: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+
+  - platform: template
+    id: comfofond_ghe_state # PDO 418
+    name: "ComfoFond GHE State"
+    accuracy_decimals: 0
+    unit_of_measurement: "%"
+    state_class: measurement
+
+  - platform: template
+    id: comfocool_condenser_temp # PDO 802 (T13)
+    name: "ComfoCool Condenser Temperature"
+    filters: [multiply: 0.1]
+    accuracy_decimals: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
     state_class: measurement

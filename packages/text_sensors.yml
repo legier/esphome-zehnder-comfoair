@@ -1,5 +1,70 @@
 text_sensor:
   - platform: template
+    id: device_state # PDO 16 (raw)
+    name: "Device State"
+    icon: mdi:state-machine
+    filters:
+      - map:
+          - 0 -> Init
+          - 1 -> Normal
+          - 2 -> Filter Wizard
+          - 3 -> Commissioning
+          - 4 -> Supplier Factory
+          - 5 -> Zehnder Factory
+          - 6 -> Standby
+          - 7 -> Away
+          - 8 -> DFC
+
+  - platform: template
+    id: application_mode # PDO 18
+    name: "Application Mode"
+    icon: mdi:application-cog-outline
+    entity_category: diagnostic
+    filters:
+      - map:
+          - 0 -> Init
+          - 1 -> Normal
+          - 2 -> Filter Wizard
+          - 3 -> Commissioning Wizard
+          - 4 -> Supplier Factory
+          - 5 -> Zehnder Factory
+          - 6 -> Recovery
+          - 7 -> Service Print
+          - 8 -> Component Check
+
+  - platform: template
+    id: rf_pairing_mode # PDO 176
+    name: "RF Pairing Mode"
+    icon: mdi:access-point-network
+    entity_category: diagnostic
+    filters:
+      - map:
+          - 0 -> Not Running
+          - 1 -> Running
+          - 2 -> Done
+          - 3 -> Failed
+          - 4 -> Aborted
+
+  - platform: template
+    id: temperature_unit # PDO 208
+    name: "Temperature Unit"
+    entity_category: diagnostic
+    filters:
+      - map:
+          - 0 -> Celsius
+          - 1 -> Fahrenheit
+
+  - platform: template
+    id: airflow_unit # PDO 224
+    name: "Airflow Unit"
+    entity_category: diagnostic
+    filters:
+      - map:
+          - 1 -> kg/h
+          - 2 -> l/s
+          - 3 -> m³/h
+
+  - platform: template
     id: fan_level # PDO 65 (raw)
     name: "Fan Level"
     icon: mdi:fan
