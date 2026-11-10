@@ -24,6 +24,7 @@ packages:
   sensors: !include sensors.yml
   switch: !include switch.yml
   text_sensors: !include text_sensors.yml
+  timed_controls: !include timed_controls.yml
 
 esphome:
   name: ${device_name}

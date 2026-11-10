@@ -1,0 +1,173 @@
+# Timer-based actions with a user-selectable duration. Pick a mode and a
+# duration, then press the matching "Apply" button to send the command.
+select:
+  - platform: template
+    id: timed_bypass_mode
+    name: "Bypass Mode"
+    icon: mdi:valve
+    options: ["Auto", "On", "Off"]
+    initial_option: "Auto"
+    optimistic: true
+    restore_value: true
+
+  - platform: template
+    id: timed_fan_level
+    name: "Timed Fan Level"
+    icon: mdi:fan-clock
+    options: ["Away", "Low", "Medium", "High"]
+    initial_option: "Medium"
+    optimistic: true
+    restore_value: true
+
+  - platform: template
+    id: timed_temperature_profile
+    name: "Timed Temperature Profile"
+    icon: mdi:thermometer
+    options: ["Normal", "Cool", "Warm"]
+    initial_option: "Normal"
+    optimistic: true
+    restore_value: true
+
+  - platform: template
+    id: timed_balance_mode
+    name: "Timed Balance Mode"
+    icon: mdi:arrow-split-vertical
+    options: ["Balanced", "Supply Only", "Exhaust Only"]
+    initial_option: "Balanced"
+    optimistic: true
+    restore_value: true
+
+number:
+  - platform: template
+    id: timed_bypass_hours
+    name: "Bypass Hours"
+    icon: mdi:timer-cog-outline
+    unit_of_measurement: h
+    min_value: 1
+    max_value: 24
+    step: 1
+    mode: box
+    optimistic: true
+    restore_value: true
+    initial_value: 1
+
+  - platform: template
+    id: timed_boost_minutes
+    name: "Boost Minutes"
+    icon: mdi:timer-cog-outline
+    unit_of_measurement: min
+    min_value: 1
+    max_value: 720
+    step: 1
+    mode: box
+    optimistic: true
+    restore_value: true
+    initial_value: 30
+
+  - platform: template
+    id: timed_fan_level_hours
+    name: "Fan Level Hours"
+    icon: mdi:timer-cog-outline
+    unit_of_measurement: h
+    min_value: 1
+    max_value: 24
+    step: 1
+    mode: box
+    optimistic: true
+    restore_value: true
+    initial_value: 1
+
+  - platform: template
+    id: timed_temperature_profile_hours
+    name: "Temperature Profile Hours"
+    icon: mdi:timer-cog-outline
+    unit_of_measurement: h
+    min_value: 1
+    max_value: 24
+    step: 1
+    mode: box
+    optimistic: true
+    restore_value: true
+    initial_value: 1
+
+  - platform: template
+    id: timed_balance_mode_hours
+    name: "Balance Mode Hours"
+    icon: mdi:timer-cog-outline
+    unit_of_measurement: h
+    min_value: 1
+    max_value: 24
+    step: 1
+    mode: box
+    optimistic: true
+    restore_value: true
+    initial_value: 1
+
+  - platform: template
+    id: timed_away_days
+    name: "Away Days"
+    icon: mdi:timer-cog-outline
+    unit_of_measurement: d
+    min_value: 1
+    max_value: 30
+    step: 1
+    mode: box
+    optimistic: true
+    restore_value: true
+    initial_value: 1
+
+button:
+  - platform: template
+    name: "Bypass Apply"
+    icon: mdi:play
+    on_press:
+      - lambda: |-
+          const auto mode = id(timed_bypass_mode).active_index().value_or(0);
+          const uint32_t secs = (uint32_t) id(timed_bypass_hours).state * 3600;
+          if (mode == 1)
+            id(comfoair)->set_bypass_mode(zehnder_comfoair_q::BYPASS_ACTIVATE, secs);
+          else if (mode == 2)
+            id(comfoair)->set_bypass_mode(zehnder_comfoair_q::BYPASS_DEACTIVATE, secs);
+          else
+            id(comfoair)->set_bypass_mode(zehnder_comfoair_q::BYPASS_AUTO, 0);
+
+  - platform: template
+    name: "Boost Apply"
+    icon: mdi:play
+    on_press:
+      - lambda: |-
+          id(comfoair)->set_boost((uint32_t) id(timed_boost_minutes).state * 60);
+
+  - platform: template
+    name: "Fan Level Apply"
+    icon: mdi:play
+    on_press:
+      - lambda: |-
+          const auto level = id(timed_fan_level).active_index().value_or(2);
+          const uint32_t secs = (uint32_t) id(timed_fan_level_hours).state * 3600;
+          id(comfoair)->set_ventilation_level((zehnder_comfoair_q::VentilationLevel) level, secs);
+
+  - platform: template
+    name: "Temperature Profile Apply"
+    icon: mdi:play
+    on_press:
+      - lambda: |-
+          const auto profile = id(timed_temperature_profile).active_index().value_or(0);
+          const uint32_t secs = (uint32_t) id(timed_temperature_profile_hours).state * 3600;
+          id(comfoair)->set_temp_profile((zehnder_comfoair_q::TemperatureProfile) profile, secs);
+
+  - platform: template
+    name: "Balance Mode Apply"
+    icon: mdi:play
+    on_press:
+      - lambda: |-
+          const auto mode = id(timed_balance_mode).active_index().value_or(0);
+          const uint32_t secs = (mode == zehnder_comfoair_q::BALANCE_MODE_BALANCED ? 0 : (uint32_t) id(timed_balance_mode_hours).state * 3600);
+          id(comfoair)->set_balance_mode((zehnder_comfoair_q::BalanceMode) mode, secs);
+
+  - platform: template
+    name: "Away Apply"
+    icon: mdi:play
+    on_press:
+      - lambda: |-
+          id(comfoair)->set_away(true, (uint32_t) id(timed_away_days).state * 86400);

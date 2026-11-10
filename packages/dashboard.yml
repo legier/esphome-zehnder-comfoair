@@ -25,6 +25,7 @@ packages:
   sensors: !include sensors.yml
   switch: !include switch.yml
   text_sensors: !include text_sensors.yml
+  timed_controls: !include timed_controls.yml
 
 external_components: !include external_components.dashboard.yml
 
