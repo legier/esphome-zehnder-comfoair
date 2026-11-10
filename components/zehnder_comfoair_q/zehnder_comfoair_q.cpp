@@ -49,12 +49,12 @@ namespace zehnder_comfoair_q
         this->send_can_message_((pdo_id << 14) + 0x40 + this->local_node_id_, true);
     }
 
-    void ZehnderComfoAirQ::set_level(uint8_t level)
+    void ZehnderComfoAirQ::set_level(uint8_t level, uint32_t duration_secs)
     {
-        send_command_set_timer(true, 0x01, 0x01, level);
+        send_command_set_timer(true, 0x01, 0x01, level, duration_secs);
     }
 
-    void ZehnderComfoAirQ::set_level_float(float state)
+    void ZehnderComfoAirQ::set_level_float(float state, uint32_t duration_secs)
     {
         uint8_t level;
         if (state >= 1)
@@ -67,7 +67,7 @@ namespace zehnder_comfoair_q
             level = 0;
         ESP_LOGD(TAG, "send_cmd_level_float: state: %f, level: %d", state, level);
 
-        set_level(level);
+        set_level(level, duration_secs);
     }
 
     void ZehnderComfoAirQ::send_command_set_timer(bool enable, uint8_t subunit_id, uint8_t property_id, uint8_t property_value, uint32_t duration_secs)

@@ -11,6 +11,9 @@ namespace zehnder_comfoair_q
 {
     static const char *const TAG = "comfoairq";
 
+    static const uint32_t TIMER_DURATION_PREDEFINED = 1; /* seems to be the constant for timers with pre-defined durations */
+    static const uint32_t TIMER_DURATION_INDEFINITE = 0xffffffff;
+
     enum VentilationLevel : uint8_t
     {
         VENTILATION_LEVEL_AWAY = 0,
@@ -60,21 +63,21 @@ namespace zehnder_comfoair_q
         void request_all_pdos();
         void request_pdo(uint16_t pdo_id);
 
-        void set_level(uint8_t level);
-        void set_level_float(float state);
+        void set_level(uint8_t level, uint32_t duration_secs = TIMER_DURATION_PREDEFINED);
+        void set_level_float(float state, uint32_t duration_secs = TIMER_DURATION_PREDEFINED);
 
         void set_boost(uint32_t duration_secs) { send_command_set_timer(duration_secs > 0, 0x01, 0x06, 3, duration_secs); }
-        void set_manual_mode(bool enable) { send_command_set_timer(enable, 0x08, 0x01, enable ? 1 : 0); }
-        void set_ventilation_level(VentilationLevel ventilation_level) { set_level(ventilation_level); }
-        void set_temp_profile(TemperatureProfile temp_profile) { send_command_set_timer(true, 0x03, 0x01, temp_profile, 0xffffffff); }
+        void set_manual_mode(bool enable, uint32_t duration_secs = TIMER_DURATION_PREDEFINED) { send_command_set_timer(enable, 0x08, 0x01, enable ? 1 : 0, duration_secs); }
+        void set_ventilation_level(VentilationLevel ventilation_level, uint32_t duration_secs = TIMER_DURATION_PREDEFINED) { set_level(ventilation_level, duration_secs); }
+        void set_temp_profile(TemperatureProfile temp_profile, uint32_t duration_secs = TIMER_DURATION_INDEFINITE) { send_command_set_timer(true, 0x03, 0x01, temp_profile, duration_secs); }
         void set_bypass_mode(BypassMode bypass_mode, uint32_t duration_secs) { send_command_set_timer(bypass_mode != BYPASS_AUTO, 0x02, 0x01, bypass_mode, duration_secs); }
         void set_temperature_passive(OffAutoOn oao) { send_command_set_property(0x1d /* TEMPHUMCONTROL */, 0x01, 0x04, oao); }
         void set_humidity_comfort(OffAutoOn oao) { send_command_set_property(0x1d /* TEMPHUMCONTROL */, 0x01, 0x06, oao); }
         void set_humidity_protection(OffAutoOn oao) { send_command_set_property(0x1d /* TEMPHUMCONTROL */, 0x01, 0x07, oao); }
-        void set_away(bool enable) { send_command_set_timer(enable, 0x01, 0x0B, 0x00, 0xffffffff); }
-        void set_supply_only(bool enable) { send_command_set_timer(enable, 0x06, 0x01, 0x00, 0xffffffff); }
-        void set_extract_only(bool enable) { send_command_set_timer(enable, 0x07, 0x01, 0x00, 0xffffffff); }
-        void set_balance_mode(BalanceMode balance_mode)
+        void set_away(bool enable, uint32_t duration_secs = TIMER_DURATION_INDEFINITE) { send_command_set_timer(enable, 0x01, 0x0B, 0x00, duration_secs); }
+        void set_supply_only(bool enable, uint32_t duration_secs = TIMER_DURATION_INDEFINITE) { send_command_set_timer(enable, 0x06, 0x01, 0x00, duration_secs); }
+        void set_extract_only(bool enable, uint32_t duration_secs = TIMER_DURATION_INDEFINITE) { send_command_set_timer(enable, 0x07, 0x01, 0x00, duration_secs); }
+        void set_balance_mode(BalanceMode balance_mode, uint32_t duration_secs = TIMER_DURATION_INDEFINITE)
         {
             if (balance_mode == BALANCE_MODE_BALANCED)
             {
@@ -83,13 +86,13 @@ namespace zehnder_comfoair_q
             }
             else if (balance_mode == BALANCE_MODE_SUPPLY_ONLY)
             {
-                set_supply_only(true);
+                set_supply_only(true, duration_secs);
                 set_extract_only(false);
             }
             else if (balance_mode == BALANCE_MODE_EXHAUST_ONLY)
             {
                 set_supply_only(false);
-                set_extract_only(true);
+                set_extract_only(true, duration_secs);
             }
             else
             {
@@ -98,7 +101,7 @@ namespace zehnder_comfoair_q
         }
 
         void send_command_set_timer(bool enable, uint8_t subunit_id, uint8_t property_id, uint8_t property_value = 0x00,
-                                    uint32_t duration_secs = 1 /* seems to be the constant for timers with pre-defined durations */);
+                                    uint32_t duration_secs = TIMER_DURATION_PREDEFINED);
         void send_command_set_property(uint8_t unit_id, uint8_t subunit_id, uint8_t property_id, uint8_t property_value);
         void send_command_set_property_uint16(uint8_t unit_id, uint8_t subunit_id, uint8_t property_id, uint16_t value)
         {
